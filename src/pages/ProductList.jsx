@@ -1,79 +1,74 @@
-import React from 'react'
-import { useState, useEffect } from 'react';
-import {
-  TableRow,
-  TableHeaderCell,
-  TableHeader,
-  TableFooter,
-  TableCell,
-  TableBody,
-  MenuItem,
-  Icon,
-  Menu,
-  Table,
-} from 'semantic-ui-react'
-import ProductService from '../services/productService';
+import React, { useState, useEffect } from 'react'
+import { Button, Icon, Menu, Table } from 'semantic-ui-react'
+import ProductService from '../services/productService'
 import { Link } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../store/actions/cartActions';
+import { toast } from 'react-toastify';
 export default function ProductList() {
-
-  const [products, setProducts] = useState([])
-
+  const dispatch = useDispatch()
+  const [products, setProducts] = useState([]);
   useEffect(() => {
     let productService = new ProductService()
     productService.getProducts().then(result => setProducts(result.data.items))
   }, [])
 
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product))
+    toast.success(`${product.productName} sepete eklendi!`)
+  }
   return (
     <div>
       <Table celled>
-        <TableHeader>
-          <TableRow>
-            <TableHeaderCell>Ürün Adı</TableHeaderCell>
-            <TableHeaderCell>Birim Fiyatı</TableHeaderCell>
-            <TableHeaderCell>Stok Adedi</TableHeaderCell>
-            <TableHeaderCell>Kategori Adı</TableHeaderCell>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Ürün Adı</Table.HeaderCell>
+            <Table.HeaderCell>Birim Fiyatı</Table.HeaderCell>
+            <Table.HeaderCell>Stok Adeti</Table.HeaderCell>
+            <Table.HeaderCell>Açıklama</Table.HeaderCell>
+            <Table.HeaderCell>Kategori</Table.HeaderCell>
+            <Table.HeaderCell></Table.HeaderCell>
 
-          </TableRow>
-        </TableHeader>
 
-        <TableBody>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
           {
-            products.map(product => (
-              <TableRow key={product.id}>
-                <TableCell><Link to={`/products/${product.productName}`}> {product.productName}</Link></TableCell>
-                <TableCell>{product.unitPrice}</TableCell>
-                <TableCell>{product.unitsInStock}</TableCell>
-                <TableCell>{product.categoryName}</TableCell>
+            products.map((product) => (
+              <Table.Row key={product.id}>
+                <Table.Cell> <Link to={`/products/${product.id}`}>{product.productName}</Link></Table.Cell>
+                <Table.Cell>{product.unitPrice}</Table.Cell>
+                <Table.Cell>{product.unitsInStock}</Table.Cell>
+                <Table.Cell>{product.quantityPerUnit}</Table.Cell>
+                <Table.Cell>{product.categoryName}</Table.Cell>
+                <Table.Cell><Button onClick={() => handleAddToCart(product)}>Sepete ekle</Button></Table.Cell>
 
-              </TableRow>
 
+              </Table.Row>
             ))
-
           }
 
+        </Table.Body>
 
-
-        </TableBody>
-
-        <TableFooter>
-          <TableRow>
-            <TableHeaderCell colSpan='3'>
+        <Table.Footer>
+          <Table.Row>
+            <Table.HeaderCell colSpan='3'>
               <Menu floated='right' pagination>
-                <MenuItem as='a' icon>
+                <Menu.Item as='a' icon>
                   <Icon name='chevron left' />
-                </MenuItem>
-                <MenuItem as='a'>1</MenuItem>
-                <MenuItem as='a'>2</MenuItem>
-                <MenuItem as='a'>3</MenuItem>
-                <MenuItem as='a'>4</MenuItem>
-                <MenuItem as='a' icon>
+                </Menu.Item>
+                <Menu.Item as='a'>1</Menu.Item>
+                <Menu.Item as='a'>2</Menu.Item>
+                <Menu.Item as='a'>3</Menu.Item>
+                <Menu.Item as='a'>4</Menu.Item>
+                <Menu.Item as='a' icon>
                   <Icon name='chevron right' />
-                </MenuItem>
+                </Menu.Item>
               </Menu>
-            </TableHeaderCell>
-          </TableRow>
-        </TableFooter>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Footer>
       </Table>
     </div>
   )
